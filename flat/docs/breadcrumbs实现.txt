@@ -1,0 +1,25 @@
+1、在每个页面对应的view中添加自己的导航信息。
+    例如deploy.html页面对应的view是deploy，那么在deploy中添加：request.breadcrumbs = [(u"发布变更", reverse("deploy"))]，
+    元组中第一个元素是在导航菜单中显示的信息，第二个元素是该信息对应的url
+
+
+2、在flat app中添加context_processor.py，并编写一个叫breadcrumbs方法，其返回上下文字典变量：
+
+    def breadcrumbs(request):
+
+        # if request.breadcrumbs[0][0] != u"首页":
+        #     request.breadcrumbs.insert(0, (u"首页", "/"))
+
+        return {"breadcrumbs" : request.breadcrumbs}
+
+
+3、在settings.py的TEMPLATES的context_processors中添加第2步编写的方法'flat.context_processor.breadcrumbs'
+
+
+4、在导航栏模板中（navbar.html）修改breadcrumbs导航的逻辑，通过遍历上下文变量breadcrumbs添加导航信息：
+
+    <ol class="breadcrumb navbar-breadcrumb">
+        {% for i in breadcrumbs %}
+            <li {% if forloop.last %}class="active"{% endif %}><a href="{{ i.1 }}">{{ i.0 }}</a></li>
+        {% endfor %}
+    </ol>

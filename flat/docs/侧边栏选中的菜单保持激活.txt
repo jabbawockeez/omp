@@ -1,0 +1,58 @@
+1、在flat app目录下创建tmeplatetags目录，并在里面创建__init__.py文件
+
+
+2、在tmeplatetags目录创建mytags.py文件，在里面创建使侧边栏菜单保持激活的方法，其原理是直接对比request中的path和a标签中href是否相等：
+
+    from django import template
+
+    register = template.Library()
+
+    @register.simple_tag
+    def nav_active(request, pattern):
+        if request.path == pattern:
+            return 'active'
+        return ''
+
+3、
+    （1）在sidebar.html中加载自定义的tag：
+
+        {% load mytags %}
+
+    （2）给url设置名称：
+
+        {% url 'index' as index %}
+        {% url 'deploy' as deploy %}
+
+    （3）侧边栏菜单设置active的逻辑，利用mytags.py里的nav_active方法，接收request和url名称作为参数，进而判断request.path与url是否一致：
+
+        <ul class="nav navbar-nav">
+            <li class="{% nav_active request index %}">
+                <a href="{% url 'index' %}">
+                    <span class="icon"></span><span class="title">首页</span>
+                </a>
+            </li>
+            <li class="{% nav_active request deploy %}">
+                <a href="{% url 'deploy' %}">
+                    <span class="icon"></span><span class="title" name="deploy">发布变更</span>
+                </a>
+            </li>
+        </ul>
+
+
+
+备注：
+    这个功能可以不用自定义tag实现，只要在sidebar.html里侧边栏菜单标签（ul）中直接对request.path和url进行对比即可：
+
+    {% url 'index' as index %}
+    {% url 'deploy' as deploy %}
+
+    <li {% if request.path == index %}class="active"{% endif %}>
+        <a href="{% url 'index' %}">
+            <span class="icon"></span><span class="title">首页</span>
+        </a>
+    </li>
+    <li {% if request.path == deploy %}class="active"{% endif %}>
+                <a href="{% url 'deploy' %}">
+                    <span class="icon"></span><span class="title" name="deploy">发布变更</span>
+                </a>
+            </li>

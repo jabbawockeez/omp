@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}deploy{% endblock %}
+
+{% block content %}
+<div class="panel panel-default">
+    
+    <div class="panel-heading">
+        <h3 class="panel-title">代码发布</h3>
+    </div>
+
+    <div class="panel-body">
+
+        <form id="deploy_form" class="form-horizontal">
+            <div class="form-group">
+                <label for="server_ip" class="col-sm-1 control-label"> 发布到：</label>
+                <div class="col-sm-10">
+                    <input name="server_ip" id="server_ip" type="text" class="form-control" placeholder="server ip" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="svn_url" class="col-sm-1 control-label"> svn地址：</label>
+                <div class="col-sm-10">
+                    <input name="svn_url" id="svn_url" type="text" class="form-control" placeholder="svn url" />
+                </div>
+                <!-- alert message -->
+                <div>
+                    <div name="alert_msg" class="alert alert-warning alert-dismissible hidden" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <strong>Warning!</strong> Better check yourself, you're not looking too good.
+                    </div>
+                </div>
+            </div>
+
+            <!-- file input -->
+            <!-- <div class="col-xs-6 col-md-4">
+                <div><input name="package" type="file" id="package"></div>
+                <p class="help-block">请选择要部署的文件</p>
+            </div> -->
+            <div class="form-group">
+              <div class="col-sm-offset-1 col-sm-10">
+                  <div class="checkbox3 checkbox-inline checkbox-check checkbox-round">
+                    <input name="jar" type="checkbox" id="checkbox-jar" checked="">
+                    <label for="checkbox-jar">
+                      jar
+                    </label>
+                  </div>
+                  <div class="checkbox3 checkbox-inline checkbox-check checkbox-round">
+                      <input name="war" type="checkbox" id="checkbox-war" checked="">
+                      <label for="checkbox-war">
+                        war
+                      </label>
+                  </div>
+              </div>
+            </div>
+
+            <!-- operation -->
+            <div class="form-group">
+              <div class="col-sm-offset-1 col-sm-10">
+                  <div class="btn-group" role="group" aria-label="Default button group">
+                    <button class="btn btn-default" id="add">添加</button>
+                    <!-- <button type="submit" class="btn btn-info" id="deploy">部署</button>
+                    <button type="submit" class="btn btn-danger" id="rollback">回滚</button> -->
+                  </div>
+              </div>
+            </div>
+
+        </form>
+<p id="result"></p>
+<!-- 
+<form id="test_form">
+  <div><input type="text" name="a" value="1" id="a" /></div>
+  <div><input type="text" name="b" value="2" id="b" /></div>
+  <div><input type="hidden" name="c" value="3" id="c" /></div>
+  <div>
+    <textarea name="d" rows="8" cols="40">4</textarea>
+  </div>
+  <div><select name="e">
+    <option value="5" selected="selected">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+  </select></div>
+  <div>
+    <input type="checkbox" name="f" value="8" id="f" />
+  </div>
+  <div>
+    <button name="g" value="Submit" id="g">提交</button>
+  </div>
+</form> -->
+
+
+        
+    </div><!-- class="panel-body" -->
+</div><!-- class="panel panel-default" -->
+
+    
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        // console.log("ready")
+
+
+
+
+// $('#test_form').submit(function() {
+//   console.log($(this).serialize());
+//   return false;
+// });
+
+
+
+
+        $("#deploy_form").submit(function(event) {
+
+            event.preventDefault();     //防止页面刷新，也可以用 return false
+
+            // 检查url是否为空
+            // if($("#svn_url").val() == "") {
+            //   $("div[name='alert_msg']").show()
+            //   return
+            // }
+
+            var data = $(this).serializeArray()
+            console.log(data)
+            // alert(data)
+
+            $.post("{% url 'ajax_deploy' %}", data, function(ret) {
+                $("#result").text(ret)
+            })
+
+           //  $.ajax({
+           //    type: "POST",
+           //    url: "{% url 'ajax_deploy' %}",
+           //    data: params,
+           //    dataType : "json",
+           //    success: function(respMsg){
+           //    }
+           // });
+
+        }) //deploy_form.submit
+
+    }); //document.ready
+
+</script>
+{% endblock %}
