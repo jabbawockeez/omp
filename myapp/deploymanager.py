@@ -8,6 +8,7 @@ import shutil
 from svn.remote import RemoteClient
 import subprocess
 import conf.deploy as deploy_conf
+from .package import *
 
 # import paramiko
 from fabric.api import env, hosts
@@ -53,41 +54,26 @@ class DeployManager(object):
         # }
         # self._get_filelist()
 
-        self.pkg_obj_list = []
-        self._get_pkg_obj()
+        # self.pkg_obj_list = []
+        # self._get_pkg_obj()
 
-        self._init_fab()
+        # self._init_fab()
 
 
-    def _init_fab(self):
+    # def _init_fab(self):
 
-        env.hosts = self.request.POST.get("server_ip").split(';')
-        # env.host_string = self.request.POST.get("server_ip")
-        env.key_filename = "~/.ssh/id_rsa"
-        env.abort_exception = Exception     # see http://docs.fabfile.org/en/latest/usage/env.html#abort-exception
-
-        
-        
-    # def init_connection(self, ip, username, port):       
-        # ip = '10.17.0.179'
-        # username = 'root'
-        # port = 22
-        # paramiko.util.log_to_file('ssh.log')
-        # s = paramiko.SSHClient()
-        # s.load_system_host_keys()
-        # s.connect(ip, port, username, key_filename = "/root/.ssh/id_rsa")
-        # stdin, stdout, stderr = s.exec_command('free -m')
-
-        # s.close()
-
-        # self.connections[ip] = s
+    #     env.hosts = self.request.POST.get("server_ip").split(';')
+    #     # env.host_string = self.request.POST.get("server_ip")
+    #     env.key_filename = "~/.ssh/id_rsa"
+    #     env.abort_exception = Exception     # see http://docs.fabfile.org/en/latest/usage/env.html#abort-exception
 
 
     # def _get_filelist(self):
     #     self.filelist = list(self.SVN_CHECKOUT_DIR.joinpath(self.package_type).glob("*.{}".format(self.package_type)))
 
-    def _get_pkg_obj(self):
-        filelist = list(self.SVN_CHECKOUT_DIR.joinpath(self.package_type).glob("*.{}".format(self.package_type)))
+    # def _get_pkg_obj(self):
+    #     filelist = [i for i in self.SVN_CHECKOUT_DIR.glob("**/*.*ar") if i.is_file()]
+    #     print filelist
 
 
     def _pull_packages(self):
@@ -98,114 +84,130 @@ class DeployManager(object):
             raise Exception("_pull_packages: get packages failed!\n" + str(e))
         
 
-    def backup_old(self):
+    # # def backup_old(self):
 
-        # print env
+    #     # print env
 
-        if not fab_files.exists(self.DIR_DEST):     # remote directory is exists?
-            raise Exception("{} does not exist!".format(self.DIR_DEST))
+    #     if not fab_files.exists(self.DIR_DEST):     # remote directory is exists?
+    #         raise Exception("{} does not exist!".format(self.DIR_DEST))
 
-        if not fab_files.exists(self.DIR_SRC):
-            run("mkdir -p {}".format(self.DIR_SRC)) # create directories on remote server
+    #     if not fab_files.exists(self.DIR_SRC):
+    #         run("mkdir -p {}".format(self.DIR_SRC)) # create directories on remote server
 
-        run("mkdir -p {}".format(self.BACKUP_DIR))
+    #     run("mkdir -p {}".format(self.BACKUP_DIR))
 
-        # print self.DIR_DEST
-        # start to backup
-        for pt in self.request.package_type:
-            for i in self.files[pt]:    # list all files type of "pt"(jar or war)
-                try:
-                    # print '=========',self.DIR_DEST / i, i
-                    run("cp {} {}".format(self.DIR_DEST.joinpath(i.name), self.BACKUP_DIR))    # upload packages to remote dir
-                except Exception as e:
-                    # print(e)
-                    raise Exception("backup_old: backup failed!\n" + str(e))
-                else:
-                    return True
+    #     # print self.DIR_DEST
+    #     # start to backup
+    #     for pt in self.request.package_type:
+    #         for i in self.files[pt]:    # list all files type of "pt"(jar or war)
+    #             try:
+    #                 # print '=========',self.DIR_DEST / i, i
+    #                 run("cp {} {}".format(self.DIR_DEST.joinpath(i.name), self.BACKUP_DIR))    # upload packages to remote dir
+    #             except Exception as e:
+    #                 # print(e)
+    #                 raise Exception("backup_old: backup failed!\n" + str(e))
+    #             else:
+    #                 return True
 
 
     # @hosts(env.hosts)
-    def upload(self):
-        # start to upload
-        for pt in self.request.package_type:
-            for i in self.files[pt]:    # list all files type of "pt"(jar or war)
-                try:
-                    # copyfile( self.DIR_DEST.joinpath(i), self.BACKUP_DIR )
-                    # self.connections[ip].exec_command("cp {} {}".format(self.DIR_DEST.joinpath(i), self.BACKUP_DIR))
-                    put(local_path = str(i), remote_path = str(self.DIR_SRC))    # upload packages to remote dir
-                except Exception as e:
-                    # print(e)
-                    raise Exception("backup_old: failed!\n" + str(e))
-                else:
-                    return True
+    # def upload(self):
+    #     # start to upload
+    #     for pt in self.request.package_type:
+    #         for i in self.files[pt]:    # list all files type of "pt"(jar or war)
+    #             try:
+    #                 # copyfile( self.DIR_DEST.joinpath(i), self.BACKUP_DIR )
+    #                 # self.connections[ip].exec_command("cp {} {}".format(self.DIR_DEST.joinpath(i), self.BACKUP_DIR))
+    #                 put(local_path = str(i), remote_path = str(self.DIR_SRC))    # upload packages to remote dir
+    #             except Exception as e:
+    #                 # print(e)
+    #                 raise Exception("backup_old: failed!\n" + str(e))
+    #             else:
+    #                 return True
 
 
-    def replace(self):
+    # def replace(self):
 
-        def replace_jar():
-            for i in self.files['jar']: 
-                run("cp {} {}".format(self.DIR_SRC.joinpath(i.name), self.DIR_DEST))
+    #     def replace_jar():
+    #         for i in self.files['jar']: 
+    #             run("cp {} {}".format(self.DIR_SRC.joinpath(i.name), self.DIR_DEST))
 
-        def replace_war():
-            pass
+    #     def replace_war():
+    #         pass
 
-        try:
-            replace_jar()
-            replace_war()
+    #     try:
+    #         replace_jar()
+    #         replace_war()
 
-        except Exception as e:
-            raise Exception("replace: failed!\n" + str(e))
-        else:
-            return True
-
-
+    #     except Exception as e:
+    #         raise Exception("replace: failed!\n" + str(e))
+    #     else:
+    #         return True
 
 
 
-    def restart(self):
+
+
+    # def restart(self):
         
-        def restart_jar():
-            print self.files['jar']
-            for i in self.files['jar']:
-                script_name = i.stem.split("-")[0] + ".sh"
-                run("sh {} restart".format(self.DIR_DEST.joinpath(script_name)))
+    #     def restart_jar():
+    #         print self.files['jar']
+    #         for i in self.files['jar']:
+    #             script_name = i.stem.split("-")[0] + ".sh"
+    #             run("sh {} restart".format(self.DIR_DEST.joinpath(script_name)))
 
 
-        def restart_war():
-            pass
+    #     def restart_war():
+    #         pass
 
-        try:
-            restart_jar()
-            restart_war()
+    #     try:
+    #         restart_jar()
+    #         restart_war()
 
-        except Exception as e:
-            raise Exception("restart: failed!\n" + str(e))
-        else:
-            return True
+    #     except Exception as e:
+    #         raise Exception("restart: failed!\n" + str(e))
+    #     else:
+    #         return True
 
 
-    def rollback(self):
-        pass
+    # def rollback(self):
+    #     pass
 
 
     def deploy(self):
-        self.backup_old()
-        self.upload()
-        self.replace()
-        self.restart()
+        filelist = [i for i in self.SVN_CHECKOUT_DIR.glob("**/*.*ar") if i.is_file()]
+
+        jar_server_ip = self.request.POST['jar_server_ip']
+        awar_server_ip = self.request.POST['awar_server_ip']
+        cwar_server_ip = self.request.POST['cwar_server_ip']
+
+        file_objs = []
+
+        for i in filelist:
+
+            o = None 
+
+            if i.suffix == ".jar" and jar_server_ip != '':     # jar
+                # print 'creating jar object'
+                o = JARPackage(i.name, jar_server_ip)
+
+            elif i.suffix == ".war":
+                if  'Admin' in i.name and awar_server_ip != '':  # admin war
+                    o = AWARPackage(i.name, awar_server_ip)
+                    # print 'creating awar object'
+                elif cwar_server_ip != '':       # common war
+                    o = CWARPackage(i.name, cwar_server_ip)
+                    # print 'creating jar object'
+
+            if o is not None:
+                file_objs.append(o)
 
 
-    # def test(self):
-    #     env.hosts = ['192.168.164.26', '192.168.164.26']
-    #     # env.host_string = self.request.POST.get("server_ip")
-    #     env.key_filename = "~/.ssh/id_rsa"
+        # print file_objs
 
-    #     run("ls -al /tmp")
-
-
-class JarDeployManager(DeployManager):
-
-    def __init__(self, request):
-        super(JarDeployManager, self).__init__(request)
-
-        self.package_type = "jar"
+        for i in file_objs:
+            # print dir(i)
+            i.backup()
+            i.upload()
+            i.replace()
+            i.restart()

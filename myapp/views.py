@@ -6,6 +6,7 @@ from django.http import HttpResponse
 import json
 from django.core.files.storage import FileSystemStorage
 from .deploymanager import *
+from .package import *
 
 
 # Create your views here.
@@ -82,15 +83,22 @@ def ajax_deploy(request):
     # else:
     #     return HttpResponse('download success')
 
+    # print request.POST.get('jar_server_ip', "abc")
+    # print request.POST['cwar_server_ip']
 
-    if 'jar' in request.POST:
-        jdm = JarDeployManager(request)
-    if 'war' in request.POST: 
-        wdm = WarDeployManager(request)
+    # if 'jar' in request.POST:
+    #     jdm = JarDeployManager(request)
+    # if 'war' in request.POST: 
+    #     wdm = WarDeployManager(request)
+
+    # jdm = JarDeployManager(request)
+    dm = DeployManager(request)
 
     try:
-        jdm.deploy()
+        dm.deploy()
     except Exception as e:
         return HttpResponse(e)
     else:
-        return HttpResponse('download success')
+        return HttpResponse('deploy success')
+
+    # JARPackage("abc.txt")

@@ -12,13 +12,8 @@
     <div class="panel-body">
 
         <form id="deploy_form" class="form-horizontal">
-            <div class="form-group">
-                <label for="server_ip" class="col-sm-1 control-label"> 发布到：</label>
-                <div class="col-sm-10">
-                    <input name="server_ip" id="server_ip" type="text" class="form-control" placeholder="server ip" />
-                </div>
-            </div>
 
+            <!-- svn url -->
             <div class="form-group">
                 <label for="svn_url" class="col-sm-1 control-label"> svn地址：</label>
                 <div class="col-sm-10">
@@ -30,15 +25,41 @@
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <strong>Warning!</strong> Better check yourself, you're not looking too good.
                     </div>
+                </div> <!-- alert message -->
+            </div> <!-- svn url -->
+
+            <!-- jar server ip -->
+            <div class="form-group">
+                <label for="jar_server_ip" class="col-sm-1 control-label"> jar发布到：</label>
+                <div class="col-sm-10">
+                    <input name="jar_server_ip" id="jar_server_ip" type="text" class="form-control" placeholder="server ip" />
                 </div>
-            </div>
+            </div> <!-- jar server ip -->
+
+            <!-- cwar server ip -->
+            <div class="form-group">
+                <label for="cwar_server_ip" class="col-sm-1 control-label"> war发布到：</label>
+                <div class="col-sm-10">
+                    <input name="cwar_server_ip" id="cwar_server_ip" type="text" class="form-control" placeholder="server ip" />
+                </div>
+            </div> <!-- cwar server ip -->
+
+            <!-- awar server ip -->
+            <div class="form-group">
+                <label for="awar_server_ip" class="col-sm-1 control-label"> admin war发布到：</label>
+                <div class="col-sm-10">
+                    <input name="awar_server_ip" id="awar_server_ip" type="text" class="form-control" placeholder="server ip" />
+                </div>
+            </div> <!-- awar server ip -->
 
             <!-- file input -->
             <!-- <div class="col-xs-6 col-md-4">
                 <div><input name="package" type="file" id="package"></div>
                 <p class="help-block">请选择要部署的文件</p>
             </div> -->
-            <div class="form-group">
+
+
+            <!-- <div class="form-group">
               <div class="col-sm-offset-1 col-sm-10">
                   <div class="checkbox3 checkbox-inline checkbox-check checkbox-round">
                     <input name="jar" type="checkbox" id="checkbox-jar" checked="">
@@ -53,13 +74,15 @@
                       </label>
                   </div>
               </div>
-            </div>
+            </div> -->
+
+            
 
             <!-- operation -->
             <div class="form-group">
               <div class="col-sm-offset-1 col-sm-10">
                   <div class="btn-group" role="group" aria-label="Default button group">
-                    <button class="btn btn-default" id="add">添加</button>
+                    <button class="btn btn-default" id="add">发布</button>
                     <!-- <button type="submit" class="btn btn-info" id="deploy">部署</button>
                     <button type="submit" class="btn btn-danger" id="rollback">回滚</button> -->
                   </div>

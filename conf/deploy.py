@@ -4,29 +4,29 @@ BACKUP_DIR_TIME_FORMAT = "%Y%m%d-%H%M"
 ################# jar #################
 
 JAR_DIR_DEST = "/usr/local/dubbox"
-JAR_BACKUP_DIR_PREFIX = "/home/appadmin/dubbox_backup"
+JAR_BACKUP_DIR = "/home/appadmin/dubbox_backup/{time}"
 
 ################# war #################
-CWAR_BACKUP_DIR_PREFIX = "/home/appadmin/tomcat_backup"
-CWAR_DIR_DEST = ["/usr/local/tomcat_{}/webapps".format(i) for i in range(0, 6)]
-AWAR_DIR_MAP = {
-    '0' : [], 
 
-    '1' : [],
+WAR_BACKUP_DIR = "/home/appadmin/tomcat_backup/{time}/tomcat_{dir_index}_backup"
+WAR_DIR_DEST = "/usr/local/tomcat_{dir_index}/webapps"
 
-    '2' : [],
+################# common war #################
 
-    '3' : [],
+CWAR_DIR_MAP = {
+    '0' : ['AccountWeb.war', 'UserWeb.war', 'ActivityWeb.war', 'FinancialWeb.war', 'MessageWeb.war'], 
 
-    '4' : [],
+    '1' : ['AssetWeb.war', 'ProductWeb.war', 'trustee.war', 'MarketWeb.war'],
 
-    '5' : []
+    '2' : ['CMSWeb.war', 'MobileWeb.war', 'RewardWeb.war', 'WapWeb.war', 'RiskControlWeb.war'],
+
+    '3' : ['MarketChannelCoopWeb.war'],
+
+    'open_8084' : ['BusinessOpenWeb.war', 'OpenDataWeb.war']
 }
 
 ################# admin war #################
 
-AWAR_BACKUP_DIR_PREFIX = "/home/appadmin/tomcat_backup"
-AWAR_DIR_DEST = ["/usr/local/tomcat_0/webapps", "/usr/local/tomcat_1/webapps"]
 AWAR_DIR_MAP = {
     '0' : ['AccountAdminWeb.war', 
             'AdminWeb.war', 
@@ -86,7 +86,8 @@ AWAR_DIR_MAP = {
 ################# svn #################
 SVN_USERNAME = "feng.huajiang"
 SVN_PASSWORD = "huajiang@zyxr.com"
-SVN_CHECKOUT_DIR = "/tmp/svn_package"
+SVN_CHECKOUT_DIR = "/srv/salt/svn_package"
+SALT_SVN_PATH = "salt://svn_package"
 
 
 ################# ssh #################
