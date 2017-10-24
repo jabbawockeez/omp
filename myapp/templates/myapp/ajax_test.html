@@ -1,20 +1,26 @@
 {% load static %}
 <body>
 
-<div id="list">
-    <p id="list_result">jabba</p>
-    <button type="button" id="get_list_btn">get list</button>
-</div>
-<div id="dict">
-    <p id="dict_result">dict</p>
-</div>
 
+<form id="test_form" class="form-horizontal">
+            
+    {% for field in form %}
+         {{ field.label_tag }}:{{ field }} 
+         {{ field.errors }}<br>
+    {% endfor %}
 
-<form method="post" action="{% url 'ajax_list' %}" enctype="multipart/form-data">
-    <input type="file" name="myfile" />
-    <!-- <input type="submit" name="submit" value="Upload" /> -->
-    <button>upload</button>
+    {{ error }}
+
+    <div class="form-group">
+      <div class="col-sm-offset-1 col-sm-10">
+          <div>
+            <button id="test_btn" class="btn btn-info">发布</button>
+          </div>
+      </div>
+    </div>
 </form>
+
+<p id="result"></p>
 
 
 <script type="text/javascript" src="{% static 'lib/js/jquery.min.js' %}"></script>
@@ -22,20 +28,20 @@
     
     $(document).ready(function() {
 
-        $("#get_list_btn").click(function() {
+         $("#test_form").submit(function(event) {
 
-            $.getJSON("{% url 'ajax_list' %}", function(ret) {
+            event.preventDefault();     //防止页面刷新，也可以用 return false
 
-                $("#list_result").empty();
 
-                $.each(ret, function(k, v) {
-                    // ht += v
-                    $("#list_result").append(v + ' ');
-                })
+            var data = $(this).serializeArray()
+            console.log(data)
+            // alert(data)
 
-                // $("#list_result").html(ht);
+            $.post("{% url 'ajax_test' %}", data, function(ret) {
+                $("#result").text(ret)
             })
-        })
+
+        }) //deploy_form.submit
 
     }); //document.ready
 

@@ -67,17 +67,17 @@ class BasePackage(object):
 
 
     def _post_init(self):
-        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.SRC_FILE.parent)])
-        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.DEST_FILE.parent)])
-        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.BACKUP_FILE.parent)])
+        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.SRC_FILE.parent)], expr_form = "list")
+        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.DEST_FILE.parent)], expr_form = "list")
+        self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.BACKUP_FILE.parent)], expr_form = "list")
 
 
     def backup(self):
-        print self.salt_client.cmd(self.server_ip, 'file.directory_exists', [str(self.BACKUP_FILE.parent)])
+        print self.salt_client.cmd(self.server_ip, 'file.directory_exists', [str(self.BACKUP_FILE.parent)], expr_form = "list")
 
         # start to backup
         try:
-            self.salt_client.cmd(self.server_ip, "file.copy", [str(self.DEST_FILE), str(self.BACKUP_FILE)])
+            self.salt_client.cmd(self.server_ip, "file.copy", [str(self.DEST_FILE), str(self.BACKUP_FILE)], expr_form = "list")
         except Exception as e:
             # print(e)
             raise Exception("backup: backup failed!\n" + str(e))
@@ -86,7 +86,7 @@ class BasePackage(object):
 
     def upload(self):
         try:
-            ret = self.salt_client.cmd(self.server_ip, "cp.get_file", [self.SVN_FILE, str(self.SRC_FILE)])    
+            ret = self.salt_client.cmd(self.server_ip, "cp.get_file", [self.SVN_FILE, str(self.SRC_FILE)], expr_form = "list")    
         except Exception as e:
             # print(e)
             raise Exception("upload: upload failed!\n" + str(e))
@@ -95,7 +95,7 @@ class BasePackage(object):
 
     def replace(self):
         try:
-            self.salt_client.cmd(self.server_ip, "file.copy", [str(self.SRC_FILE), str(self.DEST_FILE)])
+            self.salt_client.cmd(self.server_ip, "file.copy", [str(self.SRC_FILE), str(self.DEST_FILE)], expr_form = "list")
         except Exception as e:
             # print(e)
             raise Exception("replace: replace failed!\n" + str(e))
@@ -106,7 +106,10 @@ class BasePackage(object):
         pass
 
     def rollback(self):
-        pass
+        if not self.BACKUP_FILE.exists():
+            raise Exception("backup file {} not found!".format(str(self.BACKUP_FILE)))
+
+        self.salt_client.cmd(self.server_ip, file.copy, [str(self.BACKUP_FILE), str(self.DEST_FILE)], expr_form = "list")
 
 
 class JARPackage(BasePackage):
@@ -129,7 +132,7 @@ class JARPackage(BasePackage):
 
     def restart(self):
         try:
-            self.salt_client.cmd(self.server_ip, "cmd.run", ["sh", str(self.SCRIPT_FILE), "restart"])
+            self.salt_client.cmd(self.server_ip, "cmd.run", ["sh", str(self.SCRIPT_FILE), "restart"], expr_form = "list")
         except Exception as e:
             # print(e)
             raise Exception("restart: restart failed!\n" + str(e))
@@ -164,6 +167,7 @@ class WARPackage(BasePackage):
         for i in DIR_MAP.keys():
             if name in DIR_MAP[i]:
                 return i
+
 
 class AWARPackage(WARPackage):
     def __init__(self, name, server_ip):

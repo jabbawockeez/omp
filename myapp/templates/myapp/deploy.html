@@ -52,66 +52,20 @@
                 </div>
             </div> <!-- awar server ip -->
 
-            <!-- file input -->
-            <!-- <div class="col-xs-6 col-md-4">
-                <div><input name="package" type="file" id="package"></div>
-                <p class="help-block">请选择要部署的文件</p>
-            </div> -->
-
-
-            <!-- <div class="form-group">
-              <div class="col-sm-offset-1 col-sm-10">
-                  <div class="checkbox3 checkbox-inline checkbox-check checkbox-round">
-                    <input name="jar" type="checkbox" id="checkbox-jar" checked="">
-                    <label for="checkbox-jar">
-                      jar
-                    </label>
-                  </div>
-                  <div class="checkbox3 checkbox-inline checkbox-check checkbox-round">
-                      <input name="war" type="checkbox" id="checkbox-war" checked="">
-                      <label for="checkbox-war">
-                        war
-                      </label>
-                  </div>
-              </div>
-            </div> -->
-
             
-
             <!-- operation -->
             <div class="form-group">
               <div class="col-sm-offset-1 col-sm-10">
-                  <div class="btn-group" role="group" aria-label="Default button group">
-                    <button class="btn btn-default" id="add">发布</button>
-                    <!-- <button type="submit" class="btn btn-info" id="deploy">部署</button>
-                    <button type="submit" class="btn btn-danger" id="rollback">回滚</button> -->
+                  <div>
+                    <button id="deploy" class="btn btn-info">发布</button>
+                    <!-- <button id="rollback" class="btn btn-danger">回滚</button> -->
                   </div>
               </div>
             </div>
 
         </form>
-<p id="result"></p>
-<!-- 
-<form id="test_form">
-  <div><input type="text" name="a" value="1" id="a" /></div>
-  <div><input type="text" name="b" value="2" id="b" /></div>
-  <div><input type="hidden" name="c" value="3" id="c" /></div>
-  <div>
-    <textarea name="d" rows="8" cols="40">4</textarea>
-  </div>
-  <div><select name="e">
-    <option value="5" selected="selected">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-  </select></div>
-  <div>
-    <input type="checkbox" name="f" value="8" id="f" />
-  </div>
-  <div>
-    <button name="g" value="Submit" id="g">提交</button>
-  </div>
-</form> -->
 
+<p id="result"></p>
 
         
     </div><!-- class="panel-body" -->
@@ -126,34 +80,47 @@
     $(document).ready(function() {
         // console.log("ready")
 
+        $("button").click(function(event) {
 
+            event.preventDefault();
 
-
-// $('#test_form').submit(function() {
-//   console.log($(this).serialize());
-//   return false;
-// });
-
-
-
-
-        $("#deploy_form").submit(function(event) {
-
-            event.preventDefault();     //防止页面刷新，也可以用 return false
-
-            // 检查url是否为空
-            // if($("#svn_url").val() == "") {
-            //   $("div[name='alert_msg']").show()
-            //   return
-            // }
-
-            var data = $(this).serializeArray()
+            var data = $("#deploy_form").serializeArray()
             console.log(data)
-            // alert(data)
 
-            $.post("{% url 'ajax_deploy' %}", data, function(ret) {
-                $("#result").text(ret)
-            })
+            if ($(this).attr("id") == "deploy" ) {
+              // console.log($(this).attr("id"))
+                $.post("{% url 'ajax_deploy' %}", data, function(ret) {
+                  $("#result").text(ret)
+                })
+            }
+            // else if ($(this).attr("id") == "rollback") {
+            //   // console.log($(this).attr("id"))
+            //     $.post("{% url 'ajax_rollback' %}", data, function(ret) {
+            //       $("#result").text(ret)
+            //     })
+            // }
+            
+
+        }) // deploy.click
+
+
+        // $("#deploy_form").submit(function(event) {
+
+        //     event.preventDefault();     //防止页面刷新，也可以用 return false
+
+        //     // 检查url是否为空
+        //     // if($("#svn_url").val() == "") {
+        //     //   $("div[name='alert_msg']").show()
+        //     //   return
+        //     // }
+
+        //     var data = $(this).serializeArray()
+        //     console.log(data)
+        //     // alert(data)
+
+        //     $.post("{% url 'ajax_deploy' %}", data, function(ret) {
+        //         $("#result").text(ret)
+        //     })
 
            //  $.ajax({
            //    type: "POST",
@@ -164,7 +131,9 @@
            //    }
            // });
 
-        }) //deploy_form.submit
+        // }) //deploy_form.submit
+
+
 
     }); //document.ready
 
