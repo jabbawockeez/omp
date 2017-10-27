@@ -55,13 +55,15 @@ class BasePackage(object):
     def __init__(self, name, server_ip):
 
         self.name = name
-        self.server_ip = server_ip
+        self.server_ip = server_ip.split(',')
 
         self.now_str = datetime.now().strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)
 
         self.SRC_FILE = Path(deploy_conf.DIR_SRC).joinpath(self.name)
 
         self.salt_client = salt.client.LocalClient()
+
+        self._ping_target()
 
         # print "BasePackage init {}".format(self.__class__.__name__)
 
@@ -72,8 +74,20 @@ class BasePackage(object):
         self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.BACKUP_FILE.parent)], expr_form = "list")
 
 
+    def _ping_target(self):
+        ret = self.salt_client.cmd(self.server_ip, "test.ping", expr_form = "list")
+        # print ret
+
+        unreachable_server = list(set(self.server_ip) - set(ret.keys()))
+        # print unreachable_server
+
+        if len(unreachable_server) > 0:
+            raise Exception("unreachable server {}".format(','.join(unreachable_server)))
+
+
+
     def backup(self):
-        print self.salt_client.cmd(self.server_ip, 'file.directory_exists', [str(self.BACKUP_FILE.parent)], expr_form = "list")
+        # print self.salt_client.cmd(self.server_ip, 'file.directory_exists', [str(self.BACKUP_FILE.parent)], expr_form = "list")
 
         # start to backup
         try:
@@ -106,10 +120,11 @@ class BasePackage(object):
         pass
 
     def rollback(self):
-        if not self.BACKUP_FILE.exists():
-            raise Exception("backup file {} not found!".format(str(self.BACKUP_FILE)))
+        pass
+    #     if not self.BACKUP_FILE.exists():
+    #         raise Exception("backup file {} not found!".format(str(self.BACKUP_FILE)))
 
-        self.salt_client.cmd(self.server_ip, file.copy, [str(self.BACKUP_FILE), str(self.DEST_FILE)], expr_form = "list")
+    #     self.salt_client.cmd(self.server_ip, file.copy, [str(self.BACKUP_FILE), str(self.DEST_FILE)], expr_form = "list")
 
 
 class JARPackage(BasePackage):

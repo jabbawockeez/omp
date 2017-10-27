@@ -19,20 +19,14 @@
                 <div class="col-sm-10">
                     <input name="svn_url" id="svn_url" type="text" class="form-control" placeholder="svn url" />
                 </div>
-                <!-- alert message -->
-                <div>
-                    <div name="alert_msg" class="alert alert-warning alert-dismissible hidden" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <strong>Warning!</strong> Better check yourself, you're not looking too good.
-                    </div>
-                </div> <!-- alert message -->
             </div> <!-- svn url -->
+
 
             <!-- jar server ip -->
             <div class="form-group">
                 <label for="jar_server_ip" class="col-sm-1 control-label"> jar发布到：</label>
                 <div class="col-sm-10">
-                    <input name="jar_server_ip" id="jar_server_ip" type="text" class="form-control" placeholder="server ip" />
+                    <input name="jar_server_ip" id="jar_server_ip" type="text" class="form-control" placeholder="服务器ip，以英文逗号分隔" />
                 </div>
             </div> <!-- jar server ip -->
 
@@ -40,7 +34,7 @@
             <div class="form-group">
                 <label for="cwar_server_ip" class="col-sm-1 control-label"> war发布到：</label>
                 <div class="col-sm-10">
-                    <input name="cwar_server_ip" id="cwar_server_ip" type="text" class="form-control" placeholder="server ip" />
+                    <input name="cwar_server_ip" id="cwar_server_ip" type="text" class="form-control" placeholder="服务器ip，以英文逗号分隔" />
                 </div>
             </div> <!-- cwar server ip -->
 
@@ -48,7 +42,7 @@
             <div class="form-group">
                 <label for="awar_server_ip" class="col-sm-1 control-label"> admin war发布到：</label>
                 <div class="col-sm-10">
-                    <input name="awar_server_ip" id="awar_server_ip" type="text" class="form-control" placeholder="server ip" />
+                    <input name="awar_server_ip" id="awar_server_ip" type="text" class="form-control" placeholder="服务器ip，以英文逗号分隔" />
                 </div>
             </div> <!-- awar server ip -->
 
@@ -83,6 +77,8 @@
         $("button").click(function(event) {
 
             event.preventDefault();
+
+            $("#result").text("wait for result...")
 
             var data = $("#deploy_form").serializeArray()
             console.log(data)

@@ -26,32 +26,11 @@
                         <span class="icon fa fa-ship"></span><span class="title" name="deploy">发布变更</span>
                     </a>
                 </li>
-                <!-- 
+                <!-- {% url 'zusers_index' as zusers_index %}
                 <li class="{% nav_active request zusers_index %}">
                     <a href="{% url 'zusers_index' %}">
                         <span class="icon fa fa-user"></span><span class="title" name="deploy">用户管理</span>
                     </a>
-                </li> -->
-                {% url 'zusers_index' as zusers_index %}
-                <li class="{% nav_active request zusers_index %}">
-                    <a href="{% url 'zusers_index' %}">
-                        <span class="icon fa fa-user"></span><span class="title" name="deploy">用户管理</span>
-                    </a>
-                </li>
-
-                <!-- <li>
-                    <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse">
-                            <i class="glyphicon glyphicon-cog"></i>
-                            系统管理
-                               <span class="glyphicon glyphicon-chevron-toggle"></span>
-                        </a>
-                        <ul id="systemSetting" class="nav nav-list collapse secondmenu">
-                            <li class="active"><a href="#"><i class="glyphicon glyphicon-user"></i>&nbsp;用户管理</a></li>
-                            <li><a href="#"><i class="glyphicon glyphicon-th-list"></i>&nbsp;菜单管理</a></li>
-                            <li><a href="#"><i class="glyphicon glyphicon-asterisk"></i>&nbsp;角色管理</a></li>
-                            <li><a href="#"><i class="glyphicon glyphicon-edit"></i>&nbsp;修改密码</a></li>
-                            <li><a href="#"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;日志查看</a></li>
-                        </ul>
                 </li> -->
             </ul>
         </div>

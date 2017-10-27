@@ -38,17 +38,13 @@ def deploy(request):
 
     request.breadcrumbs = [(u"发布变更", reverse("deploy"))]
 
-    form = DeployForm()
-
-    print locals()
-    return render(request, "myapp/deploy.html", locals())
+    return render(request, "myapp/deploy.html")
 
 
 def ajax_deploy(request):
 
-    dm = DeployManager(request)
-
     try:
+        dm = DeployManager(request)
         dm.deploy()
     except Exception as e:
         return HttpResponse(e)

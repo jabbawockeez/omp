@@ -10,10 +10,6 @@ import subprocess
 import conf.deploy as deploy_conf
 from .package import *
 
-# import paramiko
-from fabric.api import env, hosts
-from fabric.operations import run, put
-from fabric.contrib import files as fab_files
 
 
 class DeployManager(object):
@@ -84,6 +80,6 @@ class DeployManager(object):
             i.replace()
             i.restart()
 
-    def rollback(self):
-        for i in self._file_objs:
-            i.rollback()
+    # def rollback(self):
+    #     for i in self._file_objs:
+    #         i.rollback()
