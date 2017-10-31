@@ -4,6 +4,12 @@ from pathlib import Path
 import salt.client
 import conf.deploy as deploy_conf
 from datetime import datetime
+import subprocess
+import logging
+# import tail
+import select
+import time
+import threading, thread
 
 """
 类设计思路：
@@ -13,7 +19,24 @@ from datetime import datetime
     Common War包（CWAR）
     Admin War包（AWAR）
 
-2、基本思想：尽可能将通用的属性和方法集中在基类中，子类中各自实现自定义功能。
+
+2、首先定义部署包的基类 BasePackage，其中包含了几个主要操作方法和常规属性，
+    接着分别定义 Jar包类 JARPackage 和 War包基类 WARPackage，均继承自BasePackage，
+    最后是 Common War 和 Admin War 的类，继承自 WARPackage
+    这两个类主要做的是定义自己内部的几个路径变量
+
+    继承关系如下图：
+
+            BasePackage
+                |
+         |--------------|
+    JARPackage      WARPackage
+                        |
+                 |--------------|
+            CWARPackage       AWARPackage
+
+
+3、基本思想：尽可能将通用的属性和方法集中在基类中，子类中各自实现自定义功能。
 
     不同类型的包在部署流程上大同小异，
         流程是：备份旧包 --> 拷贝新包到远程主机 --> 新包替换旧包 --> （jar包服务重启）
@@ -33,21 +56,6 @@ from datetime import datetime
     *注：以上右边四个变量除了 SVN_FILE 是字符串str，其它都是 Path 类的实例。
             SVN_FILE 因为要通过 saltstack 上传文件， 所以路径不是标准的文件系统路径，
             而是类似于 salt://svn_package/jar/xxx.jar, 其对应到文件系统中的路径是 /srv/salt/svn_package/jar/xxx.jar
-
-3、首先定义部署包的基类 BasePackage，其中包含了几个主要操作方法和常规属性，
-    接着分别定义 Jar包类 JARPackage 和 War包基类 WARPackage，均继承自BasePackage，
-    最后是 Common War 和 Admin War 的类，继承自 WARPackage
-    这两个类主要做的是定义自己内部的几个路径变量
-
-    继承关系如下图：
-
-            BasePackage
-                |
-         |--------------|
-    JARPackage      WARPackage
-                        |
-                 |--------------|
-            CWARPackage       AWARPackage
 """
 
 class BasePackage(object):
@@ -57,7 +65,8 @@ class BasePackage(object):
         self.name = name
         self.server_ip = server_ip.split(',')
 
-        self.now_str = datetime.now().strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)
+        self.start_time = datetime.now()
+        self.now_str = self.start_time.strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)
 
         self.SRC_FILE = Path(deploy_conf.DIR_SRC).joinpath(self.name)
 
@@ -67,11 +76,86 @@ class BasePackage(object):
 
         # print "BasePackage init {}".format(self.__class__.__name__)
 
+        self.LOGFILE = Path("/tmp").joinpath(self.name + ".log")
+
+        self._init_log_watcher()
+        self.log_str = "init log"
+        self.log_list = []
+
+
+        # logging.basicConfig(filename = str(self.LOGFILE), level = logging.INFO)
+
+
+    def _init_log_watcher(self):
+        self.log_watcher = subprocess.Popen('tailf -0 ' + str(self.LOGFILE), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
+
+        # self.log_watcher = threading.start_new_thread(self._append_log)
+        self.watch_log_thread = threading.Thread(target = self._append_log)
+        self.watch_log_thread.start()
+
+        # self.tail = tail.Tail(str(self.LOGFILE))
+        # self.tail.register_callback(self._append_log)
+
+        # self._poll = select.poll()
+        # self._poll.register(self.log_watcher)
+
+    # def _append_log(self, line):
+    #     print "append to log: ", line
+    # def _append_log(self, line):
+
+    def _append_log(self):
+        print "==============starting thread"
+        count = 3
+
+        # while True:
+        #     print "=============reading..."
+        #     line = self.log_watcher.stdout.readline()
+
+        #     if line:
+        #         self.log_str += line
+        #     else:
+        #         time.sleep(3)
+
+        #     count -= 1
+        #     if count == 0:
+        #         print "===========exit thread"
+        #         break
+
+        while True:
+
+            # print self.log_watcher.stdout.readlines()
+            # for i in self.log_watcher.stdout.readlines():
+            #     print i
+            #     self.log_list.append(i)
+
+            
+            # time.sleep(3)
+
+            count -= 1
+            if count == 0:
+                print "===========exit thread"
+                # self.watch_log_thread.kill()
+                break
+
+
+    def get_log(self):
+        print "=================log str ", self.log_str
+        if self.log_str == "":
+            self.log_str = self.log_watcher.stdout.read()
+
+        # return self.log_str
+        return self.log_list
+
 
     def _post_init(self):
         self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.SRC_FILE.parent)], expr_form = "list")
         self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.DEST_FILE.parent)], expr_form = "list")
         self.salt_client.cmd(self.server_ip, "file.mkdir", [str(self.BACKUP_FILE.parent)], expr_form = "list")
+
+        self.salt_client.cmd(self.server_ip, "file.touch", [str(self.LOGFILE)], expr_form = "list")
+        self.log_handler = open(str(self.LOGFILE), 'a')
+
+        # self.tail.follow(interval = 3, count = 3)
 
 
     def _ping_target(self):
@@ -85,9 +169,20 @@ class BasePackage(object):
             raise Exception("unreachable server {}".format(','.join(unreachable_server)))
 
 
+    def __del__(self):
+        self.log_watcher.kill()
+
+
 
     def backup(self):
         # print self.salt_client.cmd(self.server_ip, 'file.directory_exists', [str(self.BACKUP_FILE.parent)], expr_form = "list")
+
+        # logging.debug("start to backup")
+        # print "start to backup"
+        self.log_handler.write("{} : start to backup\n".format(datetime.now().strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)))
+        self.log_handler.flush()
+        # with open(str(self.LOGFILE), "a") as f:
+            # f.write("{} : start to backup\n".format(datetime.now().strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)))
 
         # start to backup
         try:
@@ -99,6 +194,10 @@ class BasePackage(object):
             return True
 
     def upload(self):
+        # logging.debug("start to upload")
+        self.log_handler.write("{} : start to upload\n".format(datetime.now().strftime(deploy_conf.BACKUP_DIR_TIME_FORMAT)))
+        self.log_handler.flush()
+
         try:
             ret = self.salt_client.cmd(self.server_ip, "cp.get_file", [self.SVN_FILE, str(self.SRC_FILE)], expr_form = "list")    
         except Exception as e:
@@ -108,6 +207,8 @@ class BasePackage(object):
             return True
 
     def replace(self):
+        # logging.debug("start to replace")
+
         try:
             self.salt_client.cmd(self.server_ip, "file.copy", [str(self.SRC_FILE), str(self.DEST_FILE)], expr_form = "list")
         except Exception as e:

@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^ajax_rollback/', ajax_rollback, name = "ajax_rollback"),
     # url(r'^upload_test/', simple_upload, name = "upload_test"),
     url(r'^ajax_test/', ajax_test, name = "ajax_test"),
+    url(r'^show_log/', show_log, name = "show_log"),
 ] 

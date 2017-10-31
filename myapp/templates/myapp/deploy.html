@@ -15,7 +15,7 @@
 
             <!-- svn url -->
             <div class="form-group">
-                <label for="svn_url" class="col-sm-1 control-label"> svn地址：</label>
+                <label for="svn_url" class="col-sm-1 control-label"> <strong>*</strong>svn地址：</label>
                 <div class="col-sm-10">
                     <input name="svn_url" id="svn_url" type="text" class="form-control" placeholder="svn url" />
                 </div>
@@ -61,6 +61,9 @@
 
 <p id="result"></p>
 
+<p id="pkglist"></p>
+
+<p id="log_content"></p>
         
     </div><!-- class="panel-body" -->
 </div><!-- class="panel panel-default" -->
@@ -86,7 +89,12 @@
             if ($(this).attr("id") == "deploy" ) {
               // console.log($(this).attr("id"))
                 $.post("{% url 'ajax_deploy' %}", data, function(ret) {
-                  $("#result").text(ret)
+                  ret = $.parseJSON(ret)
+
+                  console.log(ret.msg)
+
+                  $("#result").text(ret.msg)
+                  show_pkglist(ret.pkglist)
                 })
             }
             // else if ($(this).attr("id") == "rollback") {
@@ -99,39 +107,38 @@
 
         }) // deploy.click
 
-
-        // $("#deploy_form").submit(function(event) {
-
-        //     event.preventDefault();     //防止页面刷新，也可以用 return false
-
-        //     // 检查url是否为空
-        //     // if($("#svn_url").val() == "") {
-        //     //   $("div[name='alert_msg']").show()
-        //     //   return
-        //     // }
-
-        //     var data = $(this).serializeArray()
-        //     console.log(data)
-        //     // alert(data)
-
-        //     $.post("{% url 'ajax_deploy' %}", data, function(ret) {
-        //         $("#result").text(ret)
-        //     })
-
-           //  $.ajax({
-           //    type: "POST",
-           //    url: "{% url 'ajax_deploy' %}",
-           //    data: params,
-           //    dataType : "json",
-           //    success: function(respMsg){
-           //    }
-           // });
-
-        // }) //deploy_form.submit
-
-
-
     }); //document.ready
+
+
+    function get_log() {
+      _this = this
+
+      console.log(this)
+
+      $.getJSON("/myapp/show_log", {"pkg" : _this.text}, function(ret) {
+        console.log(this)
+      //   $.each(result, function(i, field){
+      //     $("#log_content").append(field + " ");
+      //   });
+      })
+
+      return false
+    }
+
+
+    function show_pkglist(pkglist) {
+
+      $("#pkglist").empty()
+
+      $.each(pkglist, function(i, n) {
+        // s = "<a href=/myapp/show_log?pkg=" + n + ">" + n + "</a><br>"
+        s = '<a href="javascript:void(0);" onclick="get_log()">' + n + "</a><br>"
+
+        $("#pkglist").append(s)
+
+
+      }) // $.each
+    } // show_pkglist
 
 </script>
 {% endblock %}

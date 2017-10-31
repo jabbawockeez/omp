@@ -12,6 +12,10 @@ from .package import *
 
 # Create your views here.
 
+
+dm = DeployManager()
+
+
 # def index(request):
 
     # method 1
@@ -43,13 +47,17 @@ def deploy(request):
 
 def ajax_deploy(request):
 
+
+    msg = "deploy success"
+
     try:
-        dm = DeployManager(request)
+        dm.set_request_obj(request)
         dm.deploy()
     except Exception as e:
-        return HttpResponse(e)
-    else:
-        return HttpResponse('deploy success')
+        # return HttpResponse(e)
+        msg = str(e)
+
+    return HttpResponse(json.dumps({"retcode" : 0, "msg" : msg, "pkglist" : [i.name for i in dm._file_objs]}))
 
 def ajax_rollback(request):
 
@@ -78,3 +86,13 @@ def ajax_test(request):
         f = DeployForm()
 
     return render(request, "myapp/ajax_test.html", {'form' : f})
+
+def show_log(request):
+
+    pkg = request.GET.get("pkg", None)
+
+    if pkg:
+
+        pkg_obj = dm.get_pkg_obj(pkg)
+
+        return HttpResponse(json.dumps(pkg_obj.get_log()))

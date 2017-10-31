@@ -16,9 +16,8 @@ class DeployManager(object):
     """
     manage package deployment
     """
-    def __init__(self, request):
+    def __init__(self):
 
-        self.request = request
 
         self.SVN_CHECKOUT_DIR = Path(deploy_conf.SVN_CHECKOUT_DIR)
 
@@ -26,10 +25,25 @@ class DeployManager(object):
         # if settings.DEBUG and self.SVN_CHECKOUT_DIR.is_dir():
         #     shutil.rmtree(str(self.SVN_CHECKOUT_DIR))
 
+        self._file_objs = self.filelist = []
+
+    def set_request_obj(self, request):
+
+        self._clean()
+
+
+        self.request = request
         self._pull_packages()
 
         self._file_objs = self._get_file_objs()
 
+
+    def _clean(self):
+        if self._file_objs and len(self._file_objs) > 0:
+            for i in self._file_objs:
+                del i
+
+        print "======cleaned", self._file_objs
 
 
     def _pull_packages(self):
@@ -37,11 +51,11 @@ class DeployManager(object):
             rc = RemoteClient(self.request.POST.get("svn_url", ""), username = deploy_conf.SVN_USERNAME, password = deploy_conf.SVN_PASSWORD)
             rc.checkout(str(self.SVN_CHECKOUT_DIR))
         except Exception as e:
-            raise Exception("_pull_packages: get packages failed!\n" + str(e))
+            raise Exception("get packages failed!\n")
         
 
     def _get_file_objs(self):
-        filelist = [i for i in self.SVN_CHECKOUT_DIR.glob("**/*.*ar") if i.is_file()]
+        self.filelist = [i for i in self.SVN_CHECKOUT_DIR.glob("**/*.*ar") if i.is_file()]
 
         jar_server_ip = self.request.POST['jar_server_ip']
         awar_server_ip = self.request.POST['awar_server_ip']
@@ -49,7 +63,7 @@ class DeployManager(object):
 
         _file_objs = []
 
-        for i in filelist:
+        for i in self.filelist:
 
             o = None 
 
@@ -68,6 +82,8 @@ class DeployManager(object):
             if o is not None:
                 _file_objs.append(o)
 
+                # print "========object ", o
+
         return _file_objs
 
 
@@ -83,3 +99,12 @@ class DeployManager(object):
     # def rollback(self):
     #     for i in self._file_objs:
     #         i.rollback()
+
+
+    def get_pkg_obj(self, pkg):
+
+        for i in self._file_objs:
+            if pkg == i.name:
+                return i
+
+        return None

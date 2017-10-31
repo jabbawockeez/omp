@@ -1,4 +1,4 @@
 # omp
 Operation management platform
 
-automate packages deployment platform based on saltstack
+automate packages deployment platform based on saltstack and django 
