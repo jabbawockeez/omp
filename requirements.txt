@@ -29,5 +29,5 @@ salt==2015.5.10
 six==1.9.0
 svn==0.3.45
 urlgrabber==3.10
-urllib3==1.10.2
+urllib3==1.26.5
 yum-metadata-parser==1.1.4
