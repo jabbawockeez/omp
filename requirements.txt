@@ -8,7 +8,7 @@ iniparse==0.4
 javapackages==1.0.0
 Jinja2==2.7.2
 kitchen==1.1.1
-lxml==3.2.1
+lxml==4.6.5
 M2Crypto==0.21.1
 MarkupSafe==0.11
 msgpack-python==0.4.8
